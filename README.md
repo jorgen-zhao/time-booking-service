@@ -37,8 +37,10 @@ Here is my thinking:
 
 **key:** Define a effective check-in time. As if employee time at the duration. It's not missing. 
 
-2. Using Java Sheduler framework to run at a definite time every day, using `cron expression` like `0 0 10,21 * * ? *`.
-3. When it start, using `JPA` query every employee's time in that day, and check the last time whether at the duration.
-4. If a employee forget check-in in the morning, the tool will automatically informs at 10:00, evening is same too.
-5. If the constant time is too late or just inform once is too little, we can change cron expression to meet our demands.
+**steps:**
+
+1. Using Java Sheduler framework to run at a definite time every day, using `cron expression` like `0 0 10,21 * * ? *`.
+2. When it start, using `JPA` query every employee's time in that day, and check the time whether at the duration.
+3. If a employee forget check-in in the morning, the tool will automatically informs at 10:00, evening is same too.
+4. If the constant time is too late or just inform once is too little, we can change cron expression to meet our demands.
 
