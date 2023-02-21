@@ -1,16 +1,21 @@
 package com.fantasy.tbs.service.impl;
 
+import com.fantasy.tbs.constant.TimeConstant;
 import com.fantasy.tbs.domain.TimeBookDTO;
 import com.fantasy.tbs.domain.TimeBooking;
 import com.fantasy.tbs.repository.TimeBookingRepository;
 import com.fantasy.tbs.service.TimeBookingService;
 import com.fantasy.tbs.service.mapper.TimeBookMapper;
-import java.util.List;
-import java.util.Optional;
+import io.jsonwebtoken.lang.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Duration;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Service Implementation for managing {@link TimeBooking}.
@@ -79,5 +84,32 @@ public class TimeBookingServiceImpl implements TimeBookingService {
     @Override
     public void bookTime(TimeBookDTO timeBookDTO) {
         timeBookingRepository.save(timeBookMapper.toTimeBooking(timeBookDTO));
+    }
+
+    @Override
+    public Long calculateWorkingTime(String personalNumber) {
+        List<ZonedDateTime> timeBookingList = timeBookingRepository.findTbsByBookingBetween(TimeConstant.MORNING_CHECK_TIME,
+            TimeConstant.EVENING_CHECK_TIME, personalNumber);
+        // make sure there is two.
+        if (Collections.isEmpty(timeBookingList)) {
+            log.error("{} dont have check data ", personalNumber);
+            return null;
+        }
+        if (timeBookingList.size() > TimeConstant.STANDARD_CHECK_TIMES) {
+            log.error("{} missing one check time", personalNumber);
+            return null;
+        }
+        // now we can make sure employee has 2 time.
+        ZonedDateTime earlyRealCheckTime = timeBookingList.get(0);
+        ZonedDateTime laterRealCheckTime = timeBookingList.get(1);
+        Duration duration = Duration.between(earlyRealCheckTime, laterRealCheckTime);
+
+        // we can minus the LUNCH_BREAK_TIME;
+        return duration.toHours();
+    }
+
+    @Override
+    public List<String> findTbsByBookingAfter(ZonedDateTime earlyCheckTime, ZonedDateTime defineTime) {
+        return timeBookingRepository.findTbsByBookingAfter(earlyCheckTime, defineTime);
     }
 }

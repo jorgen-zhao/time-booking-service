@@ -13,6 +13,10 @@
 
 Here is my thinking:
 
+**key**: We can mark two time as `start` and `end` time. Check-in time will in the middle. So when we calculate working hours, just querying time using between...and...
+
+**steps:**
+
 1. First in order to calculate the working time, so the employee should have two times. I just use the last one minus the first one. 
 
 2. How to get the correct time? So I decide to create a constant like 
@@ -31,15 +35,10 @@ Here is my thinking:
 
 Here is my thinking:
 
-1. Using a extra time after the standard time, for example 30 minutes. Constant just like 
-
-```java
-private ZonedDateTime MORNING_CHECK_TIME = ZonedDateTime.of(LocalDate.now().atTime(10, 00), ZoneOffset.UTC);
-private ZonedDateTime EVENING_CHECK_TIME = ZonedDateTime.of(LocalDate.now().atTime(21, 00), ZoneOffset.UTC);
-```
+**key:** Define a effective check-in time. As if employee time at the duration. It's not missing. 
 
 2. Using Java Sheduler framework to run at a definite time every day, using `cron expression` like `0 0 10,21 * * ? *`.
-3. When it start, using `JPA` query every employee's time in that day, and check the last time whether ahead of executing time, and less than 30 minutes.
+3. When it start, using `JPA` query every employee's time in that day, and check the last time whether at the duration.
 4. If a employee forget check-in in the morning, the tool will automatically informs at 10:00, evening is same too.
 5. If the constant time is too late or just inform once is too little, we can change cron expression to meet our demands.
 
